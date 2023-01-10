@@ -3609,7 +3609,14 @@ void Player::postAddNotification(Creature*, Thing* thing, const Cylinder* oldPar
 	int32_t index, CylinderLink_t link /*= LINK_OWNER*/)
 {
 	if(link == LINK_OWNER) //calling movement scripts
+	{
 		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index, false);
+
+		// onInventoryUpdate
+		CreatureEventList inventoryEvents = getCreatureEvents(CREATURE_EVENT_INVENTORY_UPDATE);
+		for (CreatureEventList::iterator it = inventoryEvents.begin(); it != inventoryEvents.end(); ++it)
+			(*it)->executeInventoryUpdate(this, thing->getItem(), index, true);
+	}
 
 	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT)
@@ -3657,7 +3664,14 @@ void Player::postRemoveNotification(Creature*, Thing* thing, const Cylinder* new
 	int32_t index, bool isCompleteRemoval, CylinderLink_t link/* = LINK_OWNER*/)
 {
 	if(link == LINK_OWNER) //calling movement scripts
+	{
 		g_moveEvents->onPlayerDeEquip(this, thing->getItem(), (slots_t)index, isCompleteRemoval);
+
+		// onInventoryUpdate
+		CreatureEventList inventoryEvents = getCreatureEvents(CREATURE_EVENT_INVENTORY_UPDATE);
+		for (CreatureEventList::iterator it = inventoryEvents.begin(); it != inventoryEvents.end(); ++it)
+			(*it)->executeInventoryUpdate(this, thing->getItem(), index, false);
+	}
 
 	bool requireListUpdate = true;
 	if(link == LINK_OWNER || link == LINK_TOPPARENT)
